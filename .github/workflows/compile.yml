@@ -1,0 +1,34 @@
+name: Compile Typst Document
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v3
+
+      - name: Compile thesis.typ to PDF
+        run: typst compile thesis.typ thesis.pdf
+
+      - name: Update latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build
+          files: thesis.pdf
+          prerelease: true
+          body: |
+            Automatically compiled from the latest commit on main.
+            
+            Commit: ${{ github.sha }}
